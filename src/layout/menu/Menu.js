@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import menu from "./MenuData";
+import { menu, complainerMenu, adminMenu } from "./MenuData";
 import Icon from "../../components/icon/Icon";
 import classNames from "classnames";
 import { NavLink, Link } from "react-router-dom";
@@ -200,24 +200,93 @@ const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props })
 };
 
 const Menu = ({ sidebarToggle, mobileView }) => {
+
+  const accountType = localStorage.getItem("account_type");
+
+  // useEffect(() => {
+  //   alert(accountType);
+  // }, [Menu])
+
   return (
     <ul className="nk-menu">
-      {menu.map((item) =>
-        item.heading ? (
-          <MenuHeading heading={item.heading} key={item.heading} />
-        ) : (
-          <MenuItem
-            key={item.text}
-            link={item.link}
-            icon={item.icon}
-            text={item.text}
-            sub={item.subMenu}
-            badge={item.badge}
-            sidebarToggle={sidebarToggle}
-            mobileView={mobileView}
-          />
-        )
+      {accountType === 'complainer' ? (
+        <>
+          {complainerMenu.map((item) =>
+            item.heading ? (
+              <MenuHeading heading={item.heading} key={item.heading} />
+            ) : (
+              <MenuItem
+                key={item.text}
+                link={item.link}
+                icon={item.icon}
+                text={item.text}
+                sub={item.subMenu}
+                badge={item.badge}
+                sidebarToggle={sidebarToggle}
+                mobileView={mobileView}
+              />
+            )
+          )}
+        </>
+      ) : accountType === 'admin' ? (
+        <>
+          {adminMenu.map((item) =>
+            item.heading ? (
+              <MenuHeading heading={item.heading} key={item.heading} />
+            ) : (
+              <MenuItem
+                key={item.text}
+                link={item.link}
+                icon={item.icon}
+                text={item.text}
+                sub={item.subMenu}
+                badge={item.badge}
+                sidebarToggle={sidebarToggle}
+                mobileView={mobileView}
+              />
+            )
+          )}
+        </>
+      ) : accountType === 'user' ? (
+        <>
+          {menu.map((item) =>
+            item.heading ? (
+              <MenuHeading heading={item.heading} key={item.heading} />
+            ) : (
+              <MenuItem
+                key={item.text}
+                link={item.link}
+                icon={item.icon}
+                text={item.text}
+                sub={item.subMenu}
+                badge={item.badge}
+                sidebarToggle={sidebarToggle}
+                mobileView={mobileView}
+              />
+            )
+          )}
+        </>
+      ) : (
+        <>
+          {menu.map((item) =>
+            item.heading ? (
+              <MenuHeading heading={item.heading} key={item.heading} />
+            ) : (
+              <MenuItem
+                key={item.text}
+                link={item.link}
+                icon={item.icon}
+                text={item.text}
+                sub={item.subMenu}
+                badge={item.badge}
+                sidebarToggle={sidebarToggle}
+                mobileView={mobileView}
+              />
+            )
+          )}
+        </>
       )}
+
     </ul>
   );
 };

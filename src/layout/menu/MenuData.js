@@ -555,4 +555,31 @@ const menu = [
     active: "false",
   },
 ];
-export default menu;
+
+const complainerMenu = [
+  {
+    icon: "user-alt",
+    text: "Profile",
+    link: "/complainer-profile",
+  },
+  {
+    icon: "file-plus",
+    text: "Add New Complain",
+    link: "/add-new-complain",
+  },
+  {
+    icon: "file-docs",
+    text: "My Complains",
+    link: "/complainer-complain-list",
+  },
+];
+
+const adminMenu = [
+  {
+    icon: "users",
+    text: "Users List",
+    link: "/admin/users-list",
+  },
+];
+
+export { menu, complainerMenu, adminMenu };

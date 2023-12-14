@@ -20,6 +20,7 @@ const Header = ({ fixed, className, ...props }) => {
     [`is-${theme.header}`]: theme.header !== "white" && theme.header !== "light",
     [`${className}`]: className,
   });
+
   return (
     <div className={headerClass}>
       <div className="container-fluid">
@@ -34,19 +35,16 @@ const Header = ({ fixed, className, ...props }) => {
           <div className="nk-header-brand d-xl-none">
             <Logo />
           </div>
-          <div className="nk-header-news d-none d-xl-block">
-            <News />
-          </div>
+
           <div className="nk-header-tools">
             <ul className="nk-quick-nav">
-              <li className="user-dropdown"  onClick={themeUpdate.sidebarHide}>
+              <li className="user-dropdown" onClick={themeUpdate.sidebarHide}>
                 <User />
               </li>
-              <li className="notification-dropdown me-n1"  onClick={themeUpdate.sidebarHide}>
-                <Notification />
-              </li>
+
             </ul>
           </div>
+
         </div>
       </div>
     </div>

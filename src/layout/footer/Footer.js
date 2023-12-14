@@ -8,27 +8,9 @@ const Footer = () => {
         <div className="nk-footer-wrap">
           <div className="nk-footer-copyright">
             {" "}
-            &copy; 2022 DashLite. Template by <a href="https://softnio.com">Softnio</a>
+            &copy; 2022 Enviro Guard.
           </div>
-          <div className="nk-footer-links">
-            <ul className="nav nav-sm">
-              <li className="nav-item">
-                <Link to={`${process.env.PUBLIC_URL}/pages/terms-policy`} className="nav-link">
-                  Terms
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to={`${process.env.PUBLIC_URL}/pages/faq`} className="nav-link">
-                  Privacy
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to={`${process.env.PUBLIC_URL}/pages/terms-policy`} className="nav-link">
-                  Help
-                </Link>
-              </li>
-            </ul>
-          </div>
+          <div className="nk-footer-links"> </div>
         </div>
       </div>
     </div>

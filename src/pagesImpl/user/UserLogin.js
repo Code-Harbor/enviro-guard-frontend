@@ -17,7 +17,8 @@ import { Form, Spinner, Modal } from "reactstrap";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import Toast from "../../utils/Toast";
+import axios from "axios";
 
 const UserLogin = () => {
 
@@ -26,22 +27,77 @@ const UserLogin = () => {
   const [loading, setLoading] = useState(false);
   const [passState, setPassState] = useState(false);
 
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
 
 
-
+  // user login - function
   const login = () => {
     setLoading(true);
-    localStorage.setItem('account_type', 'admin');
 
+    // validate input data
+    if (userEmail.length === 0 || userPassword.length === 0) {
 
-      navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
+      setLoading(false);
+      Toast('close');
+      Toast('warning', 'Please enter a valid email and password');
 
+    } else {
 
-    setLoading(false);
+      // send request to backend
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/user/user-login`,
+        headers: {
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUU19HRU4iLCJuYW1lIjoiVFNUUEwiLCJpYXQiOjE2MzgwODI0ODAsImF1dGhvciI6InZpaGFuZ2F3aWNrcyIsImV4cCI6MjIwODk2OTAwMH0.MdzZ0xzpDoOR56JRQg5Vusq4onJevPVjvMckuaWcZ4U',
+        },
+          data: {
+          email: userEmail,
+          password: userPassword,
+        }
+      }).then((res) => {
+
+        let data = res.data;
+
+        // check admin or user 
+        if (data.type === 'admin') {
+
+          // save user details on local storage
+          localStorage.setItem('account_type', 'admin');
+          localStorage.setItem('user_details', JSON.stringify(data));
+          navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
+
+        } else if (data.type === 'user') {
+
+          // save user details on local storage
+          localStorage.setItem('account_type', 'user');
+          localStorage.setItem('user_details', JSON.stringify(data));
+          navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
+
+        }
+
+        setLoading(false);
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    }
+
   }
 
   return <>
-    <Head title="Login" />
+    <Head title="Admin Login" />
     <Block className="nk-block-middle nk-auth-body  wide-xs">
 
       <div className="brand-logo pb-4 text-center">
@@ -56,12 +112,12 @@ const UserLogin = () => {
           <BlockContent>
             <BlockTitle tag="h4">Admin Sign-In</BlockTitle>
             <BlockDes>
-              <p>Access Enviro Guard Admin using your email and passcode.</p>
+              <p>Access Enviro Guard Admin using your email and password.</p>
             </BlockDes>
           </BlockContent>
         </BlockHead>
 
-        <form className="is-alter">
+        <form>
           <div className="form-group">
             <div className="form-label-group">
               <label className="form-label" htmlFor="default-01">
@@ -72,14 +128,19 @@ const UserLogin = () => {
               <input
                 type="text"
                 placeholder="Enter your email address or username"
-                className="form-control-lg form-control" />
+                className="form-control-lg form-control"
+                value={userEmail}
+                onChange={(e) => {
+                  setUserEmail(e.target.value);
+                }}
+              />
 
             </div>
           </div>
           <div className="form-group">
             <div className="form-label-group">
               <label className="form-label" htmlFor="password">
-                Passcode
+                password
               </label>
               {/* <Link className="link link-primary link-sm" to={`${process.env.PUBLIC_URL}/auth-reset`}>
                 Forgot Code?
@@ -101,14 +162,20 @@ const UserLogin = () => {
               <input
                 type={passState ? "text" : "password"}
                 placeholder="Enter your passcode"
-                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`} />
+                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
+                value={userPassword}
+                onChange={(e) => {
+                  setUserPassword(e.target.value);
+                }}
+              />
 
             </div>
           </div>
           <div className="form-group">
 
-            <Button size="lg" className="btn-block" type="submit" color="primary"
-              onClick={() => {
+            <Button size="lg" className="btn-block" color="primary"
+              onClick={(e) => {
+                e.preventDefault();
                 login();
               }}
             >

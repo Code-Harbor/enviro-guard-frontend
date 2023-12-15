@@ -22,13 +22,21 @@ import {
 } from "../../components/Component";
 import { transactionData } from "../../components/table/TableData";
 import AddNewUserModal from "./modals/AddNewUserModal";
+import Toast from "../../utils/Toast";
+import axios from "axios";
+
 
 const UsersList = ({ data }) => {
 
-  const [addComplainModal, setAddComplainModal] = useState(false);
+  const [usersList, setUsersList] = useState([]);
 
-  const toggleAddComplainModal = () => {
-    setAddComplainModal(!addComplainModal);
+  const [allInstitute, setAllInstitute] = useState([]);
+  const [dropdownBtnValue, setDropdownBtnValue] = useState({ value: 0, label: 'All Users' })
+
+  const [addUserModal, setAddUserModal] = useState(false);
+
+  const toggleAddUserModal = () => {
+    setAddUserModal(!addUserModal);
   };
 
   const DropdownTrans = () => {
@@ -78,6 +86,87 @@ const UsersList = ({ data }) => {
     );
   };
 
+
+  // call get all institute function
+  useEffect(() => {
+    getAlInstitute();
+  }, [UsersList])
+
+
+  // get all institute - function
+  const getAlInstitute = () => {
+
+    // send request to backend
+    axios({
+      method: 'GET',
+      url: `http://localhost:8080/institute/get-all-institute`,
+    }).then((res) => {
+
+      let data = res.data;
+      console.log(data);
+
+      // create data for dropdown selection
+      let tempArray = [];
+      data.forEach(element => {
+        let obj = {
+          value: element.id,
+          label: element.name
+        }
+        tempArray.push(obj);
+      });
+
+      setAllInstitute(tempArray);
+
+    }).catch((error) => {
+      console.log(error);
+
+      if (error.response !== undefined) {
+        Toast('close');
+        Toast('error', error.response.data);
+      } else {
+        Toast('close');
+        Toast('error', 'Something went wrong');
+      }
+
+    })
+  }
+
+
+
+  // get all users when render component
+  useEffect(() => {
+    getUsersByInstituteId(0);
+  }, [UsersList])
+
+
+  // get user by institute id - function
+  const getUsersByInstituteId = (instituteId) => {
+
+    // send request to backend
+    axios({
+      method: 'GET',
+      url: `http://localhost:8080/user/get-all-users-by-institute/${instituteId}`,
+    }).then((res) => {
+
+      let data = res.data;
+      console.log(data);
+      setUsersList(data)
+
+    }).catch((error) => {
+      console.log(error);
+
+
+      if (error.response !== undefined) {
+        Toast('close');
+        Toast('error', error.response.data);
+      } else {
+        Toast('close');
+        Toast('error', 'Something went wrong');
+      }
+
+    })
+  }
+
   return <>
     <Head title="Users List"></Head>
     <Content>
@@ -98,7 +187,7 @@ const UsersList = ({ data }) => {
                     <UncontrolledDropdown>
                       <DropdownToggle tag="a" className="dropdown-toggle btn btn-white btn-dim btn-outline-light">
                         <Icon className="d-none d-sm-inline" name="users" />
-                        <span>All Users</span>
+                        <span>{dropdownBtnValue.label}</span>
                         <Icon className="dd-indc" name="chevron-right" />
                       </DropdownToggle>
                       <DropdownMenu>
@@ -108,17 +197,39 @@ const UsersList = ({ data }) => {
                               tag="a"
                               onClick={(ev) => {
                                 ev.preventDefault();
+                                setDropdownBtnValue({ value: 0, label: 'All Users' });
+                                getUsersByInstituteId(0);
                               }}
                               href="#!"
                             >
                               <span>All Users</span>
                             </DropdownItem>
                           </li>
-                          <li>
+                          {
+                            allInstitute.map((item, i) =>
+                              <li>
+                                <DropdownItem
+                                  tag="a"
+                                  onClick={(ev) => {
+                                    ev.preventDefault();
+                                    setDropdownBtnValue(item);
+                                    getUsersByInstituteId(item.value);
+                                  }}
+                                  href="#dropdownitem"
+                                >
+                                  <span>{item.label}</span>
+                                </DropdownItem>
+                              </li>
+                            )
+                          }
+
+                          {/* <li>
                             <DropdownItem
                               tag="a"
                               onClick={(ev) => {
                                 ev.preventDefault();
+                                setDropdownBtnValue('Wildlife');
+                                getUsersByInstituteId(1);
                               }}
                               href="#dropdownitem"
                             >
@@ -130,12 +241,15 @@ const UsersList = ({ data }) => {
                               tag="a"
                               onClick={(ev) => {
                                 ev.preventDefault();
+                                setDropdownBtnValue('Forestry and Environmental');
+                                getUsersByInstituteId(2);
                               }}
                               href="#dropdownitem"
                             >
                               <span>Forestry and Environmental</span>
                             </DropdownItem>
-                          </li>
+                          </li> */}
+
                         </ul>
                       </DropdownMenu>
                     </UncontrolledDropdown>
@@ -143,7 +257,7 @@ const UsersList = ({ data }) => {
 
                   <li className="nk-block-tools-opt">
                     <Button color="primary" className="btn-icon" onClick={() => {
-                      toggleAddComplainModal();
+                      toggleAddUserModal();
                     }}>
                       <Icon name="plus"></Icon>
                     </Button>
@@ -166,20 +280,16 @@ const UsersList = ({ data }) => {
                   <span className="">#</span>
                 </th>
                 <th className="tb-tnx-info">
-                  <span className="tb-tnx-desc d-none d-sm-inline-block">
-                    <span>Bill For</span>
-                  </span>
-                  <span className="tb-tnx-date d-md-inline-block d-none">
-                    <span className="d-md-none">Date</span>
-                    <span className="d-none d-md-block">
-                      <span>Issue Date</span>
-                      <span>Due Date</span>
-                    </span>
-                  </span>
+                  <span>Name</span>
                 </th>
-                <th className="tb-tnx-amount is-alt">
-                  <span className="tb-tnx-total">Total</span>
-                  <span className="tb-tnx-status d-none d-md-inline-block">Status</span>
+                <th className="tb-tnx-info">
+                  <span>Email</span>
+                </th>
+                <th className="tb-tnx-info">
+                  <span>Institute</span>
+                </th>
+                <th className="tb-tnx-info">
+                  <span>Role</span>
                 </th>
                 <th className="tb-tnx-action">
                   <span>&nbsp;</span>
@@ -187,99 +297,36 @@ const UsersList = ({ data }) => {
               </tr>
             </thead>
             <tbody>
-              {data
-                ? data.map((item) => {
-                  return (
-                    <tr key={item.id} className="tb-tnx-item">
-                      <td className="tb-tnx-id">
-                        <a
-                          href="#id"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                        >
-                          <span>{item.id}</span>
-                        </a>
-                      </td>
-                      <td className="tb-tnx-info">
-                        <div className="tb-tnx-desc">
-                          <span className="title">{item.bill}</span>
-                        </div>
-                        <div className="tb-tnx-date">
-                          <span className="date">{item.issue}</span>
-                          <span className="date">{item.due}</span>
-                        </div>
-                      </td>
-                      <td className="tb-tnx-amount is-alt">
-                        <div className="tb-tnx-total">
-                          <span className="amount">${item.total}</span>
-                        </div>
-                        <div className="tb-tnx-status">
-                          <Badge
-                            className="badge-dot"
-                            color={
-                              item.status === "Paid" ? "success" : item.status === "Due" ? "warning" : "danger"
-                            }
-                          >
-                            {item.status}
-                          </Badge>
-                        </div>
-                      </td>
+              {usersList.map((item, i) => {
+                return (
+                  <tr key={item.id} className="tb-tnx-item">
+                    <td className="tb-tnx-id">
+                      <span>{i + 1}</span>
+                    </td>
+                    <td className="tb-tnx-info">
+                      <span className="title">{item.name}</span>
+                    </td>
+                    <td className="tb-tnx-info">
+                      <span className="title">{item.email}</span>
+                    </td>
+                    <td className="tb-tnx-info">
+                      <span className="title">{item.institute.name}</span>
+                    </td>
+                    <td className="tb-tnx-info">
+                      <span className="title">{item.role}</span>
+                    </td>
 
 
-                      <td className="tb-tnx-action">
-                        <DropdownTrans />
-                      </td>
-
-                    </tr>
-                  );
-                })
-                : transactionData.data.map((item) => {
-                  return (
-                    <tr key={item.id} className="tb-tnx-item">
-                      <td className="tb-tnx-id">
-                        <a
-                          href="#id"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                        >
-                          <span>{item.id}</span>
-                        </a>
-                      </td>
-                      <td className="tb-tnx-info">
-                        <div className="tb-tnx-desc">
-                          <span className="title">{item.bill}</span>
-                        </div>
-                        <div className="tb-tnx-date">
-                          <span className="date">{item.issue}</span>
-                          <span className="date">{item.due}</span>
-                        </div>
-                      </td>
-                      <td className="tb-tnx-amount is-alt">
-                        <div className="tb-tnx-total">
-                          <span className="amount">${item.total}</span>
-                        </div>
-                        <div className="tb-tnx-status">
-                          <Badge
-                            className="badge-dot"
-                            color={
-                              item.status === "Paid" ? "success" : item.status === "Due" ? "warning" : "danger"
-                            }
-                          >
-                            {item.status}
-                          </Badge>
-                        </div>
-                      </td>
 
 
-                      <td className="tb-tnx-action">
-                        <DropdownTrans />
-                      </td>
+                    <td className="tb-tnx-action">
+                      <DropdownTrans />
+                    </td>
 
-                    </tr>
-                  );
-                })}
+                  </tr>
+                );
+              })
+              }
             </tbody>
           </table>
 
@@ -288,8 +335,9 @@ const UsersList = ({ data }) => {
 
     </Content>
 
-    <Modal isOpen={addComplainModal} size="lg" toggle={toggleAddComplainModal}>
-      <AddNewUserModal toggle={toggleAddComplainModal} />
+    <Modal isOpen={addUserModal} size="lg" toggle={toggleAddUserModal}>
+      <AddNewUserModal toggle={toggleAddUserModal} showModal={addUserModal}
+        getUsersByInstituteId={getUsersByInstituteId} dropdownBtnValue={dropdownBtnValue} />
     </Modal>
 
   </>;

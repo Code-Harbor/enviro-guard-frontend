@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "../../../components/Component";
 import { Row, Col } from "reactstrap";
 import { RSelect } from "../../../components/Component";
+import Toast from "../../../utils/Toast";
+import axios from "axios";
+import { Spinner } from "reactstrap";
 
-const AddNewUserModal = ({ toggle, }) => {
+
+const AddNewUserModal = ({ toggle, showModal, getUsersByInstituteId, dropdownBtnValue }) => {
 
   const instituteOptions = [
     { value: "1", label: "Wildlife" },
@@ -11,11 +15,150 @@ const AddNewUserModal = ({ toggle, }) => {
   ];
 
   const userRoleOptions = [
-    { value: "1", label: "Director" },
-    { value: "2", label: "Manager" },
-    { value: "3", label: "Investigation Officer" },
+    { value: "Director", label: "Director" },
+    { value: "Manager", label: "Manager" },
+    { value: "Investigation Officer", label: "Investigation Officer" },
   ];
 
+
+  const [allInstitute, setAllInstitute] = useState([]);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState({});
+  const [selectedInstitute, setSelectedInstitute] = useState({});
+
+  const [loading, setLoading] = useState(false);
+
+
+  // call get all institute function
+  useEffect(() => {
+    if (showModal) {
+      getAlInstitute();
+    }
+  }, [showModal])
+
+
+  // get all institute - function
+  const getAlInstitute = () => {
+
+    // send request to backend
+    axios({
+      method: 'GET',
+      url: `http://localhost:8080/institute/get-all-institute`,
+    }).then((res) => {
+
+      let data = res.data;
+      console.log(data);
+
+      // create data for dropdown selection
+      let tempArray = [];
+      data.forEach(element => {
+        let obj = {
+          value: element.id,
+          label: element.name
+        }
+        tempArray.push(obj);
+      });
+
+      setAllInstitute(tempArray);
+
+    }).catch((error) => {
+      console.log(error);
+
+      if (error.response !== undefined) {
+        Toast('close');
+        Toast('error', error.response.data);
+      } else {
+        Toast('close');
+        Toast('error', 'Something went wrong');
+      }
+
+    })
+  }
+
+  // add new user - function
+  const addNewUser = () => {
+    setLoading(true);
+
+    console.log('insti ', selectedInstitute.value);
+    console.log('name ', name);
+    console.log('email ', email);
+    console.log('password ', password);
+    console.log('role ', selectedRole.value);
+
+    // validate data
+    let isValidated = validate();
+
+    if (isValidated) {
+      // send request to backend
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/user/register-user`,
+        data: {
+          name: name,
+          email: email,
+          password: password,
+          type: 'user',
+          role: selectedRole.value,
+          instituteId: selectedInstitute.value
+        }
+      }).then((res) => {
+
+        let data = res.data;
+        getUsersByInstituteId(dropdownBtnValue.value);
+        setLoading(false);
+        toggle();
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    }
+  }
+
+  // data validate
+  const validate = () => {
+    if (name.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Name can not be empty');
+      return false;
+    } else if (email.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Email can not be empty');
+      return false;
+    } else if (password.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Password can not be empty');
+      return false;
+    } else if (selectedInstitute.value === undefined) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Institute can not be empty');
+      return false;
+    } else if (selectedRole.value === undefined) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Role can not be empty');
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   return (
     <React.Fragment>
@@ -41,7 +184,12 @@ const AddNewUserModal = ({ toggle, }) => {
             <div className="form-group">
               <label className="form-label">Institute</label>
               <div className="form-group">
-                <RSelect options={instituteOptions} />
+                <RSelect options={allInstitute}
+                  value={selectedInstitute}
+                  onChange={(value) => {
+                    setSelectedInstitute(value);
+                  }}
+                />
               </div>
             </div>
           </Col>
@@ -52,7 +200,12 @@ const AddNewUserModal = ({ toggle, }) => {
                 Name
               </label>
               <div className="form-control-wrap">
-                <input type="text" id="full-name-1" className="form-control" />
+                <input type="text" id="full-name-1" className="form-control"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
+                />
               </div>
             </div>
           </Col>
@@ -62,7 +215,12 @@ const AddNewUserModal = ({ toggle, }) => {
                 Email
               </label>
               <div className="form-control-wrap">
-                <input type="text" id="email-address-1" className="form-control" />
+                <input type="text" id="email-address-1" className="form-control"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
+                />
               </div>
             </div>
           </Col>
@@ -72,7 +230,12 @@ const AddNewUserModal = ({ toggle, }) => {
                 Password
               </label>
               <div className="form-control-wrap">
-                <input type="text" id="email-address-1" className="form-control" />
+                <input type="text" id="email-address-1" className="form-control"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                />
               </div>
             </div>
           </Col>
@@ -80,7 +243,12 @@ const AddNewUserModal = ({ toggle, }) => {
             <div className="form-group">
               <label className="form-label">User Role</label>
               <div className="form-group">
-                <RSelect options={userRoleOptions} />
+                <RSelect options={userRoleOptions}
+                  value={selectedRole}
+                  onChange={(value) => {
+                    setSelectedRole(value);
+                  }}
+                />
               </div>
             </div>
           </Col>
@@ -110,11 +278,11 @@ const AddNewUserModal = ({ toggle, }) => {
                   href="link"
                   onClick={(ev) => {
                     ev.preventDefault();
-                    // 
+                    addNewUser();
                   }}
                   className="btn btn-primary"
                 >
-                  Save
+                  {loading ? <Spinner size="sm" color="light" /> : "Save"}
                 </a>
               </li>
             </ul>

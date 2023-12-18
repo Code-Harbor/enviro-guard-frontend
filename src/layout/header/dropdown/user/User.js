@@ -3,14 +3,35 @@ import UserAvatar from "../../../../components/user/UserAvatar";
 import { DropdownToggle, DropdownMenu, Dropdown } from "reactstrap";
 import { Icon } from "../../../../components/Component";
 import { LinkList, LinkItem } from "../../../../components/links/Links";
+import { useNavigate } from "react-router-dom";
+
 
 const User = () => {
+
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((prevState) => !prevState);
 
+  //---------------------------------------------------------------
+
+  const navigate = useNavigate();
+
+  const accountType = localStorage.getItem('account_type');
+  const loggedComplainer = JSON.parse(localStorage.getItem('logged_complainer'));
+  const loggedUser = JSON.parse(localStorage.getItem('logged_user'));
+
+  // handle sign out function
   const handleSignout = () => {
-    localStorage.removeItem("accessToken");
+
+    if (accountType === 'complainer') {
+      navigate(`${process.env.PUBLIC_URL}/`);
+    } else if (accountType === 'admin') {
+      navigate(`${process.env.PUBLIC_URL}/admin-login`);
+    } else if (accountType === 'user') {
+      navigate(`${process.env.PUBLIC_URL}/admin-login`);
+    }
+
   };
+
 
   return (
     <Dropdown isOpen={open} className="user-dropdown" toggle={toggle}>
@@ -24,25 +45,47 @@ const User = () => {
       >
         <div className="user-toggle">
           <UserAvatar icon="user-alt" className="sm" />
-          <div className="user-info d-none d-md-block">
-            <div className="user-status">Administrator</div>
-            <div className="user-name dropdown-indicator">Abu Bin Ishityak</div>
-          </div>
+          {accountType === 'complainer' ? (
+            <div className="user-info d-none d-md-block">
+              <div className="user-status">{loggedComplainer.email}</div>
+              <div className="user-name dropdown-indicator">{loggedComplainer.name}</div>
+            </div>
+          ) : (
+            <div className="user-info d-none d-md-block">
+              <div className="user-status">{loggedUser.role}</div>
+              <div className="user-name dropdown-indicator">{loggedUser.name}</div>
+            </div>
+          )}
         </div>
       </DropdownToggle>
       <DropdownMenu end className="dropdown-menu-md dropdown-menu-s1">
         <div className="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
-          <div className="user-card sm">
-            <div className="user-avatar">
-              <span>AB</span>
+
+          {accountType === 'complainer' ? (
+            <div className="user-card sm">
+              <div className="user-avatar">
+                <span>AB</span>
+              </div>
+              <div className="user-info">
+                <span className="lead-text">{loggedComplainer.name}</span>
+                <span className="sub-text">{loggedComplainer.email}</span>
+              </div>
             </div>
-            <div className="user-info">
-              <span className="lead-text">Abu Bin Ishtiyak</span>
-              <span className="sub-text">info@softnio.com</span>
+          ) : (
+            <div className="user-card sm">
+              <div className="user-avatar">
+                <span>AB</span>
+              </div>
+              <div className="user-info">
+                <span className="lead-text">{loggedUser.name}</span>
+                <span className="sub-text">{loggedUser.email}</span>
+              </div>
             </div>
-          </div>
+          )}
+
+
         </div>
-        <div className="dropdown-inner">
+        {/* <div className="dropdown-inner">
           <LinkList>
             <LinkItem link="/user-profile-regular" icon="user-alt" onClick={toggle}>
               View Profile
@@ -54,10 +97,14 @@ const User = () => {
               Login Activity
             </LinkItem>
           </LinkList>
-        </div>
+        </div> */}
         <div className="dropdown-inner">
           <LinkList>
-            <a href={`${process.env.PUBLIC_URL}/auth-login`} onClick={handleSignout}>
+            <a href='#' onClick={(e) => {
+              e.preventDefault();
+              handleSignout();
+            }}
+            >
               <Icon name="signout"></Icon>
               <span>Sign Out</span>
             </a>

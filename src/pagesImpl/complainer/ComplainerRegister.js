@@ -14,22 +14,97 @@ import {
   Icon,
   PreviewCard,
 } from "../../components/Component";
-import { Spinner } from "reactstrap";
-import { useForm } from "react-hook-form";
+import { Spinner, Modal } from "reactstrap";
 import { Link } from "react-router-dom";
+import Toast from "../../utils/Toast";
+import axios from "axios";
+import AddNewComplainModal from "./modals/AddNewComplainModal";
+
 
 const ComplainerRegister = () => {
 
   const [passState, setPassState] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm();
+
   const navigate = useNavigate();
-  const handleFormSubmit = () => {
-    setLoading(true);
-    setTimeout(() => {
-      navigate(`${process.env.PUBLIC_URL}/auth-success`);
-    }, 1000);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [addComplainModal, setAddComplainModal] = useState(false);
+
+  const toggleAddComplainModal = () => {
+    setAddComplainModal(!addComplainModal);
   };
+
+
+  // complainer register function
+  const registerComplainer = () => {
+    setLoading(true);
+
+    // validate data
+    let isValidated = validate();
+
+    if (isValidated) {
+      // send request to backend
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/complainer/register-complainer`,
+        data: {
+          name: name,
+          email: email,
+          password: password,
+        }
+      }).then((res) => {
+
+        let data = res.data;
+        setLoading(false);
+
+        Toast('close');
+        Toast('success', 'Succussfully registered');
+
+        navigate(`${process.env.PUBLIC_URL}/`);
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    }
+
+  };
+
+  // data validate
+  const validate = () => {
+    if (name.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Name can not be empty');
+      return false;
+    } else if (email.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Email can not be empty');
+      return false;
+    } else if (password.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Password can not be empty');
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   return <>
     <Head title="Register" />
@@ -49,7 +124,8 @@ const ComplainerRegister = () => {
             </BlockDes>
           </BlockContent>
         </BlockHead>
-        <form className="is-alter" onSubmit={handleSubmit(handleFormSubmit)}>
+
+        <form>
           <div className="form-group">
             <label className="form-label" htmlFor="name">
               Name
@@ -57,11 +133,14 @@ const ComplainerRegister = () => {
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="name"
-                {...register('name', { required: true })}
                 placeholder="Enter your name"
-                className="form-control-lg form-control" />
-              {errors.name && <p className="invalid">This field is required</p>}
+                className="form-control-lg form-control"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+              />
+
             </div>
           </div>
           <div className="form-group">
@@ -74,17 +153,20 @@ const ComplainerRegister = () => {
               <input
                 type="text"
                 bssize="lg"
-                id="default-01"
-                {...register('email', { required: true })}
                 className="form-control-lg form-control"
-                placeholder="Enter your email address or username" />
-              {errors.email && <p className="invalid">This field is required</p>}
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+
             </div>
           </div>
           <div className="form-group">
             <div className="form-label-group">
               <label className="form-label" htmlFor="password">
-                Passcode
+                Password
               </label>
             </div>
             <div className="form-control-wrap">
@@ -103,14 +185,23 @@ const ComplainerRegister = () => {
               <input
                 type={passState ? "text" : "password"}
                 id="password"
-                {...register('passcode', { required: "This field is required" })}
                 placeholder="Enter your passcode"
-                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`} />
-              {errors.passcode && <span className="invalid">{errors.passcode.message}</span>}
+                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
+
             </div>
           </div>
           <div className="form-group">
-            <Button type="submit" color="primary" size="lg" className="btn-block">
+            <Button color="primary" size="lg" className="btn-block"
+              onClick={(e) => {
+                e.preventDefault();
+                registerComplainer();
+              }}
+            >
               {loading ? <Spinner size="sm" color="light" /> : "Register"}
             </Button>
           </div>
@@ -134,6 +225,7 @@ const ComplainerRegister = () => {
               href="#socials"
               onClick={(ev) => {
                 ev.preventDefault();
+                toggleAddComplainModal();
               }}
             >
               Make complain
@@ -144,6 +236,11 @@ const ComplainerRegister = () => {
       </PreviewCard>
     </Block>
     <AuthFooter />
+
+    <Modal isOpen={addComplainModal} size="lg" toggle={toggleAddComplainModal}>
+      <AddNewComplainModal toggle={toggleAddComplainModal} />
+    </Modal>
+
   </>;
 };
 export default ComplainerRegister;

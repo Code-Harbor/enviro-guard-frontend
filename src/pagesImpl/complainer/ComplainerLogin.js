@@ -15,17 +15,22 @@ import {
 } from "../../components/Component";
 import { Form, Spinner, Modal } from "reactstrap";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, json } from "react-router-dom";
 import AddNewComplainModal from "./modals/AddNewComplainModal";
 import { useNavigate } from "react-router-dom";
+import Toast from "../../utils/Toast";
+import axios from "axios";
+
 
 const ComplainerLogin = () => {
 
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(false);
   const [passState, setPassState] = useState(false);
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [addComplainModal, setAddComplainModal] = useState(false);
 
@@ -34,17 +39,65 @@ const ComplainerLogin = () => {
   };
 
 
-
+  // complainer login function
   const login = () => {
-    console.log('login woring');
     setLoading(true);
-    localStorage.setItem('account_type', 'complainer');
+
+    // validate data
+    let isValidated = validate();
+
+    if (isValidated) {
+      // send request to backend
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/complainer/complainer-login`,
+        data: {
+          email: email,
+          password: password,
+        }
+      }).then((res) => {
+
+        let data = res.data;
+        localStorage.setItem('account_type', 'complainer');
+        localStorage.setItem('logged_complainer', JSON.stringify(data));
+
+        setLoading(false);
+
+        navigate(`${process.env.PUBLIC_URL}/complainer-profile`);
 
 
-    navigate(`${process.env.PUBLIC_URL}/complainer-profile`);
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
 
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
 
-    setLoading(false);
+      })
+
+    }
+  }
+
+  // data validate
+  const validate = () => {
+    if (email.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Email can not be empty');
+      return false;
+    } else if (password.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Password can not be empty');
+      return false;
+    } else {
+      return true;
+    }
   }
 
   return <>
@@ -78,15 +131,20 @@ const ComplainerLogin = () => {
             <div className="form-control-wrap">
               <input
                 type="text"
-                placeholder="Enter your email address or username"
-                className="form-control-lg form-control" />
+                placeholder="Enter your email address"
+                className="form-control-lg form-control"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
 
             </div>
           </div>
           <div className="form-group">
             <div className="form-label-group">
               <label className="form-label" htmlFor="password">
-                Passcode
+                Password
               </label>
               {/* <Link className="link link-primary link-sm" to={`${process.env.PUBLIC_URL}/auth-reset`}>
                 Forgot Code?
@@ -108,14 +166,20 @@ const ComplainerLogin = () => {
               <input
                 type={passState ? "text" : "password"}
                 placeholder="Enter your passcode"
-                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`} />
+                className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
 
             </div>
           </div>
           <div className="form-group">
 
-            <Button size="lg" className="btn-block" type="submit" color="primary"
-              onClick={() => {
+            <Button size="lg" className="btn-block" color="primary"
+              onClick={(e) => {
+                e.preventDefault();
                 login();
               }}
             >

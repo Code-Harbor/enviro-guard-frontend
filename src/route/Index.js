@@ -124,7 +124,7 @@ import Layout from "../layout/Index";
 import LayoutNoSidebar from "../layout/Index-nosidebar";
 import ComplainerLogin from "../pagesImpl/complainer/ComplainerLogin";
 import ComplainerRegister from "../pagesImpl/complainer/ComplainerRegister";
-import ComplainerProfileRegular from "../pagesImpl/complainer/ComplainerProfileRegular";
+import ComplainerProfile from "../pagesImpl/complainer/ComplainerProfile";
 import ComplainerProfileSetting from "../pagesImpl/complainer/ComplainerProfileSetting";
 import ComplainList from "../pagesImpl/complainer/ComplainList";
 import AddNewComplain from "../pagesImpl/complainer/AddNewComplain";
@@ -144,7 +144,7 @@ const Router = () => {
 
         {/* IMPL */}
         <Route >
-          <Route path="complainer-profile" element={<ComplainerProfileRegular />}></Route>
+          <Route path="complainer-profile" element={<ComplainerProfile />}></Route>
           <Route path="complainer-profile-setting" element={<ComplainerProfileSetting />}></Route>
           <Route path="complainer-complain-list" element={<ComplainList />}></Route>
           <Route path="add-new-complain" element={<AddNewComplain />}></Route>

@@ -64,14 +64,14 @@ const UserLogin = () => {
 
           // save user details on local storage
           localStorage.setItem('account_type', 'admin');
-          localStorage.setItem('user_details', JSON.stringify(data));
+          localStorage.setItem('logged_user', JSON.stringify(data));
           navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
 
         } else if (data.type === 'user') {
 
           // save user details on local storage
           localStorage.setItem('account_type', 'user');
-          localStorage.setItem('user_details', JSON.stringify(data));
+          localStorage.setItem('logged_user', JSON.stringify(data));
           navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
 
         }

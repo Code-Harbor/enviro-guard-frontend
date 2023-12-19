@@ -23,10 +23,13 @@ const User = () => {
   const handleSignout = () => {
 
     if (accountType === 'complainer') {
+      localStorage.removeItem('logged_complainer');
       navigate(`${process.env.PUBLIC_URL}/`);
     } else if (accountType === 'admin') {
+      localStorage.removeItem('logged_user');
       navigate(`${process.env.PUBLIC_URL}/admin-login`);
     } else if (accountType === 'user') {
+      localStorage.removeItem('logged_user');
       navigate(`${process.env.PUBLIC_URL}/admin-login`);
     }
 
@@ -43,6 +46,7 @@ const User = () => {
           ev.preventDefault();
         }}
       >
+
         <div className="user-toggle">
           <UserAvatar icon="user-alt" className="sm" />
           {accountType === 'complainer' ? (
@@ -57,8 +61,10 @@ const User = () => {
             </div>
           )}
         </div>
+
       </DropdownToggle>
       <DropdownMenu end className="dropdown-menu-md dropdown-menu-s1">
+
         <div className="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
 
           {accountType === 'complainer' ? (
@@ -85,19 +91,7 @@ const User = () => {
 
 
         </div>
-        {/* <div className="dropdown-inner">
-          <LinkList>
-            <LinkItem link="/user-profile-regular" icon="user-alt" onClick={toggle}>
-              View Profile
-            </LinkItem>
-            <LinkItem link="/user-profile-setting" icon="setting-alt" onClick={toggle}>
-              Account Setting
-            </LinkItem>
-            <LinkItem link="/user-profile-activity" icon="activity-alt" onClick={toggle}>
-              Login Activity
-            </LinkItem>
-          </LinkList>
-        </div> */}
+
         <div className="dropdown-inner">
           <LinkList>
             <a href='#' onClick={(e) => {

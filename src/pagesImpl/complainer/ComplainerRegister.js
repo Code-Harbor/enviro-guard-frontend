@@ -238,7 +238,7 @@ const ComplainerRegister = () => {
     <AuthFooter />
 
     <Modal isOpen={addComplainModal} size="lg" toggle={toggleAddComplainModal}>
-      <AddNewComplainModal toggle={toggleAddComplainModal} />
+      <AddNewComplainModal toggle={toggleAddComplainModal} showModal={addComplainModal} registeredComplainer={false} />
     </Modal>
 
   </>;

@@ -72,7 +72,7 @@ const UserLogin = () => {
           // save user details on local storage
           localStorage.setItem('account_type', 'user');
           localStorage.setItem('logged_user', JSON.stringify(data));
-          navigate(`${process.env.PUBLIC_URL}/admin/users-list`);
+          navigate(`${process.env.PUBLIC_URL}/admin/user-dashboard`);
 
         }
 

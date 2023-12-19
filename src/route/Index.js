@@ -126,10 +126,13 @@ import ComplainerLogin from "../pagesImpl/complainer/ComplainerLogin";
 import ComplainerRegister from "../pagesImpl/complainer/ComplainerRegister";
 import ComplainerProfile from "../pagesImpl/complainer/ComplainerProfile";
 import ComplainerProfileSetting from "../pagesImpl/complainer/ComplainerProfileSetting";
-import ComplainList from "../pagesImpl/complainer/ComplainList";
+import ComplainerComplainList from "../pagesImpl/complainer/ComplainList";
 import AddNewComplain from "../pagesImpl/complainer/AddNewComplain";
 import UserLogin from "../pagesImpl/user/UserLogin";
 import UsersList from "../pagesImpl/user/UsersList";
+import ComplainView from "../pagesImpl/common/ComplainView";
+import UserDashboard from "../pagesImpl/user/UserDashboard";
+import UserComplainList from "../pagesImpl/user/UserComplainList";
 
 const Router = () => {
   const location = useLocation();
@@ -146,12 +149,16 @@ const Router = () => {
         <Route >
           <Route path="complainer-profile" element={<ComplainerProfile />}></Route>
           <Route path="complainer-profile-setting" element={<ComplainerProfileSetting />}></Route>
-          <Route path="complainer-complain-list" element={<ComplainList />}></Route>
+          <Route path="complainer-complain-list" element={<ComplainerComplainList />}></Route>
           <Route path="add-new-complain" element={<AddNewComplain />}></Route>
+          
+          <Route path="complain-view" element={<ComplainView />}></Route>
         </Route>
 
         <Route path="admin">
           <Route path="users-list" element={<UsersList/>}></Route>
+          <Route path="user-dashboard" element={<UserDashboard/>}></Route>
+          <Route path="user-complain-list" element={<UserComplainList/>}></Route>
         </Route>
 
         <Route path="home-page" element={<Homepage />}></Route>

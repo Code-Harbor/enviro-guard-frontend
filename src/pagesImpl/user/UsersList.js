@@ -55,7 +55,7 @@ const UsersList = ({ data }) => {
                   ev.preventDefault();
                 }}
               >
-                View
+                Update
               </DropdownItem>
             </li>
             <li>
@@ -66,20 +66,10 @@ const UsersList = ({ data }) => {
                   ev.preventDefault();
                 }}
               >
-                Invoice
+                Delete
               </DropdownItem>
             </li>
-            <li>
-              <DropdownItem
-                tag="a"
-                href="#dropdownitem"
-                onClick={(ev) => {
-                  ev.preventDefault();
-                }}
-              >
-                Print
-              </DropdownItem>
-            </li>
+            
           </ul>
         </DropdownMenu>
       </UncontrolledDropdown>

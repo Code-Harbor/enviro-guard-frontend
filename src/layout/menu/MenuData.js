@@ -582,4 +582,16 @@ const adminMenu = [
   },
 ];
 
-export { menu, complainerMenu, adminMenu };
+const userMenu = [
+  {
+    icon: "grid-alt",
+    text: "Dashboard",
+    link: "/admin/user-dashboard",
+  },
+  {
+    icon: "file-docs",
+    text: "Complaint List",
+    link: "/admin/user-complain-list",
+  },
+];
+export { menu, complainerMenu, adminMenu, userMenu };

@@ -111,6 +111,9 @@ const AddNewUserModal = ({ toggle, showModal, getUsersByInstituteId, dropdownBtn
         setLoading(false);
         toggle();
 
+        Toast('close');
+        Toast('success', 'Successfully added');
+
       }).catch((error) => {
         console.log(error);
         setLoading(false);

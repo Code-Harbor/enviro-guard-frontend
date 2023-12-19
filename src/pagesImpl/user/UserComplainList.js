@@ -20,24 +20,34 @@ import {
   Icon,
   Button,
 } from "../../components/Component";
-import { transactionData } from "../../components/table/TableData";
-import AddNewComplainModal from "./modals/AddNewComplainModal";
 import Toast from "../../utils/Toast";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import ChangeStatusModal from "./modals/ChangeStatusModal";
+import AddInvestigationReport from "./modals/AddInvestigationReport";
 
 
-const ComplainList = () => {
+const UserComplainList = ({ data }) => {
 
   const navigate = useNavigate();
 
-  const [addComplainModal, setAddComplainModal] = useState(false);
+  const [updateStatusModal, setUpdateStatusModal] = useState(false);
+  const [addReportModal, setAddReportModal] = useState(false);
 
-  const toggleAddComplainModal = () => {
-    setAddComplainModal(!addComplainModal);
+  const toggleUpdateStatusModal = () => {
+    setUpdateStatusModal(!updateStatusModal);
+  };
+  const toggleAddReportModal = () => {
+    setAddReportModal(!addReportModal);
   };
 
+
+  const [selectedComplaintId, setSelectedComplaintId] = useState('');
+  const [selectedComplaint, setSelectedComplaint] = useState({});
+
+
   const DropdownTrans = ({ rowdata }) => {
+
     return (
       <UncontrolledDropdown>
         <DropdownToggle tag="a" className="text-soft dropdown-toggle btn btn-icon btn-trigger">
@@ -57,12 +67,39 @@ const ComplainList = () => {
                 View
               </DropdownItem>
             </li>
+            <li>
+              <DropdownItem
+                tag="a"
+                href="#dropdownitem"
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  setSelectedComplaint(rowdata);
+                  toggleUpdateStatusModal();
+                }}
+              >
+                Change Status
+              </DropdownItem>
+            </li>
+            <li>
+              <DropdownItem
+                tag="a"
+                href="#dropdownitem"
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  setSelectedComplaintId(rowdata.id);
+                  toggleAddReportModal();
+                }}
+              >
+                Add Investigation Report
+              </DropdownItem>
+            </li>
 
           </ul>
         </DropdownMenu>
       </UncontrolledDropdown>
     );
   };
+
 
   const options = {
     year: 'numeric',
@@ -76,23 +113,23 @@ const ComplainList = () => {
 
   //-------------------------------------------------------------------------
 
-  const complainerDetails = JSON.parse(localStorage.getItem('logged_complainer'));
+  const userDetails = JSON.parse(localStorage.getItem('logged_user'));
 
   const [complaintList, setComplaintList] = useState([]);
 
   // call get all complaint function
   useEffect(() => {
-    getComplaintByComplainer();
-  }, [ComplainList])
+    getComplaintByInstitute();
+  }, [UserComplainList])
 
 
-  // get all complaint by complainer - function
-  const getComplaintByComplainer = () => {
+  // get all complaint by institute - function
+  const getComplaintByInstitute = () => {
 
     // send request to backend
     axios({
       method: 'GET',
-      url: `http://localhost:8080/complaint/get-all-complains-by-complainer/${complainerDetails.id}`,
+      url: `http://localhost:8080/complaint/get-all-complains-by-institute/${userDetails.institute.id}`,
     }).then((res) => {
 
       let data = res.data;
@@ -129,22 +166,7 @@ const ComplainList = () => {
               Complaint List
             </BlockTitle>
           </BlockHeadContent>
-          <BlockHeadContent>
-            <div className="toggle-wrap nk-block-tools-toggle">
-              <div className="toggle-expand-content" style={{ display: "block" }}>
-                <ul className="nk-block-tools g-3">
 
-                  <li className="nk-block-tools-opt">
-                    <Button color="primary" className="btn-icon" onClick={() => {
-                      toggleAddComplainModal();
-                    }}>
-                      <Icon name="plus"></Icon>
-                    </Button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </BlockHeadContent>
         </BlockBetween>
       </BlockHead>
 
@@ -227,12 +249,20 @@ const ComplainList = () => {
 
     </Content>
 
-    <Modal isOpen={addComplainModal} size="lg" toggle={toggleAddComplainModal}>
-      <AddNewComplainModal toggle={toggleAddComplainModal} showModal={addComplainModal} registeredComplainer={true}
-        getComplaintByComplainer={getComplaintByComplainer}
+
+    <Modal isOpen={updateStatusModal} size="md" toggle={toggleUpdateStatusModal}>
+      <ChangeStatusModal toggle={toggleUpdateStatusModal} showModal={updateStatusModal}
+        selectedComplaint={selectedComplaint} getComplaintByInstitute={getComplaintByInstitute}
+      />
+    </Modal>
+
+
+    <Modal isOpen={addReportModal} size="lg" toggle={toggleAddReportModal}>
+      <AddInvestigationReport toggle={toggleAddReportModal} showModal={addReportModal}
+        selectedComplaintId={selectedComplaintId} getComplaintByInstitute={getComplaintByInstitute}
       />
     </Modal>
 
   </>;
 };
-export default ComplainList;
+export default UserComplainList;

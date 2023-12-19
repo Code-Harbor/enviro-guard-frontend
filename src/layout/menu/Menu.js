@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { menu, complainerMenu, adminMenu } from "./MenuData";
+import { menu, complainerMenu, adminMenu, userMenu } from "./MenuData";
 import Icon from "../../components/icon/Icon";
 import classNames from "classnames";
 import { NavLink, Link } from "react-router-dom";
@@ -249,7 +249,7 @@ const Menu = ({ sidebarToggle, mobileView }) => {
         </>
       ) : accountType === 'user' ? (
         <>
-          {menu.map((item) =>
+          {userMenu.map((item) =>
             item.heading ? (
               <MenuHeading heading={item.heading} key={item.heading} />
             ) : (

@@ -10,7 +10,7 @@ import { Spinner } from "reactstrap";
 const AddInvestigationReport = ({ toggle, showModal, selectedComplaintId, getComplaintByInstitute }) => {
 
   const [complainDesc, setComplainDesc] = useState('');
-  const [selectedImage, setSelectedImage] = useState();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -18,33 +18,41 @@ const AddInvestigationReport = ({ toggle, showModal, selectedComplaintId, getCom
   const saveInvestigationReport = () => {
     setLoading(true);
 
-    let formData = new FormData();
-    formData.append('complaintId', selectedComplaintId);
-    formData.append('description', complainDesc);
-    formData.append('imageFile', selectedImage);
+    if (complainDesc.length > 0) {
+      let formData = new FormData();
+      formData.append('complaintId', selectedComplaintId);
+      formData.append('description', complainDesc);
 
-    axios({
-      method: 'POST',
-      url: `http://localhost:8080/investigation/add-investigation-report`,
-      data: formData
-    }).then((res) => {
+      if (selectedImage !== null)
+        formData.append('imageFile', selectedImage);
 
-      updateComplaintStatus();
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/investigation/add-investigation-report`,
+        data: formData
+      }).then((res) => {
 
-    }).catch((error) => {
-      console.log(error);
+        updateComplaintStatus();
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    } else {
       setLoading(false);
-
-      if (error.response !== undefined) {
-        Toast('close');
-        Toast('error', error.response.data);
-      } else {
-        Toast('close');
-        Toast('error', 'Something went wrong');
-      }
-
-    })
-
+      Toast('close');
+      Toast('error', 'Investigation report can not be empty');
+    }
 
   }
 

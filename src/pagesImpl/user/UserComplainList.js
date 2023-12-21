@@ -80,6 +80,8 @@ const UserComplainList = ({ data }) => {
                 Change Status
               </DropdownItem>
             </li>
+
+            {userDetails.role === 'Investigation Officer' ? (
             <li>
               <DropdownItem
                 tag="a"
@@ -93,7 +95,8 @@ const UserComplainList = ({ data }) => {
                 Add Investigation Report
               </DropdownItem>
             </li>
-
+            ): <></> }
+            
           </ul>
         </DropdownMenu>
       </UncontrolledDropdown>

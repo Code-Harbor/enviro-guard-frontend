@@ -153,6 +153,18 @@ const ComplainView = () => {
                     </div>
                   </Collapse>
 
+                  {complaintDetails.image !== undefined ? (
+                    <Collapse isOpen={collapse2}>
+                      <div className="divider"></div>
+                      <div className="rating-card-description">
+                        <h5 className="card-title">Image</h5>
+
+                        <img style={{ width: '400px' }} src={complaintDetails.image} />
+
+                      </div>
+                    </Collapse>
+                  ) : <></>}
+
                 </div>
 
               </Card>
@@ -202,37 +214,52 @@ const ComplainView = () => {
                       </div>
                     </Collapse>
 
-                  </div>
-                  <div className="card-footer rating-card-footer bg-light border-top d-flex align-center justify-content-between">
-                    <a
-                      className="switch-text collapsed"
-                      onClick={(ev) => {
-                        ev.preventDefault();
-                        setCollapse2(!collapse2);
-                      }}
-                      href="#collapseDes1"
-                    >
-                      {collapse2 ? (
-                        <div className="link link-gray switch-text-normal">
-                          <span>Less Info</span>
-                          <Icon name="upword-ios"></Icon>
+                    {investigationDetails.image !== undefined ? (
+                      <Collapse isOpen={collapse2}>
+                        <div className="divider"></div>
+                        <div className="rating-card-description">
+                          <h5 className="card-title">Image</h5>
+
+                          <img style={{ width: '400px' }} src={investigationDetails.image} />
+
                         </div>
-                      ) : (
-                        <div className="link link-gray switch-text-collapsed">
-                          <span>More Info</span>
-                          <Icon name="downward-ios"></Icon>
-                        </div>
-                      )}
-                    </a>
-                    {accountType === 'user' ? (
-                      <>
-                        {userDetails.role === 'Manager' || userDetails.role === 'Director' ? (
-                          <Button color="primary">Approve</Button>
-                        ) : null}
-                      </>
+                      </Collapse>
                     ) : <></>}
 
                   </div>
+
+                  {accountType === 'user' ? (
+                    <>
+                      {userDetails.role === 'Manager' || userDetails.role === 'Director' ? (
+                        <div className="card-footer rating-card-footer bg-light border-top d-flex align-center justify-content-between">
+                          <a
+                            className="switch-text collapsed"
+                            onClick={(ev) => {
+                              ev.preventDefault();
+                              setCollapse2(!collapse2);
+                            }}
+                            href="#collapseDes1"
+                          >
+                            {collapse2 ? (
+                              <div className="link link-gray switch-text-normal">
+                                <span>Less Info</span>
+                                <Icon name="upword-ios"></Icon>
+                              </div>
+                            ) : (
+                              <div className="link link-gray switch-text-collapsed">
+                                <span>More Info</span>
+                                <Icon name="downward-ios"></Icon>
+                              </div>
+                            )}
+                          </a>
+
+                          <Button color="primary">Approve</Button>
+
+
+                        </div>
+                      ) : null}
+                    </>
+                  ) : <></>}
 
                 </Card>
               </Col>

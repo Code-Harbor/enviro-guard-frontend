@@ -17,7 +17,7 @@ const AddNewComplainModal = ({ toggle, showModal, registeredComplainer, getCompl
   const [location, setLocation] = useState('');
   const [title, setTitle] = useState('');
   const [complainDesc, setComplainDesc] = useState('');
-  const [selectedImage, setSelectedImage] = useState();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -71,50 +71,87 @@ const AddNewComplainModal = ({ toggle, showModal, registeredComplainer, getCompl
   const addComplaint = () => {
     setLoading(true);
 
-    let formData = new FormData();
-    if (registeredComplainer) {
-      formData.append('complainerId', complainerDetails.id);
-    } else {
-      formData.append('complainerId', 0);
-    }
-    formData.append('instituteId', selectedInstitute.value);
-    formData.append('complainTitle', title);
-    formData.append('complainDescription', complainDesc);
-    formData.append('location', location);
-    formData.append('imageFile', selectedImage);
+    let isValidated = validateData();
 
+    if (isValidated) {
 
-    axios({
-      method: 'POST',
-      url: `http://localhost:8080/complaint/add-complaint`,
-      data: formData
-    }).then((res) => {
+      let formData = new FormData();
 
-      let data = res.data;
-      console.log(data);
-      setLoading(false);
-
-      toggle();
-
-      if (registeredComplainer)
-        getComplaintByComplainer();
-      
-      Toast('close');
-      Toast('success', 'Successfully saved');
-
-    }).catch((error) => {
-      console.log(error);
-      setLoading(false);
-
-      if (error.response !== undefined) {
-        Toast('close');
-        Toast('error', error.response.data);
+      if (registeredComplainer) {
+        formData.append('complainerId', complainerDetails.id);
       } else {
-        Toast('close');
-        Toast('error', 'Something went wrong');
+        formData.append('complainerId', 0);
       }
 
-    })
+      formData.append('instituteId', selectedInstitute.value);
+      formData.append('complainTitle', title);
+      formData.append('complainDescription', complainDesc);
+      formData.append('location', location);
+
+      if (selectedImage !== null)
+        formData.append('imageFile', selectedImage);
+
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/complaint/add-complaint`,
+        data: formData
+      }).then((res) => {
+
+        let data = res.data;
+        console.log(data);
+        setLoading(false);
+
+        toggle();
+
+        if (registeredComplainer)
+          getComplaintByComplainer();
+
+        Toast('close');
+        Toast('success', 'Successfully saved');
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    }
+
+  }
+
+  // validate input data - function
+  const validateData = () => {
+    if (Object.keys(selectedInstitute).length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Please select a institute');
+      return false;
+    } else if (location.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Location can not be empty');
+      return false;
+    } else if (title.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Title can not be empty');
+      return false;
+    } else if (complainDesc.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Description can not be empty');
+      return false;
+    } else {
+      return true;
+    }
   }
 
   return (
@@ -150,7 +187,7 @@ const AddNewComplainModal = ({ toggle, showModal, registeredComplainer, getCompl
               </div>
             </div>
           </Col>
-          {/* <Col lg="6"></Col> */}
+
           <Col lg="6">
             <div className="form-group">
               <label className="form-label" htmlFor="email-address-1">

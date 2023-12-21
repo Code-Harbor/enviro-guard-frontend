@@ -28,7 +28,7 @@ const AddNewComplain = () => {
   const [location, setLocation] = useState('');
   const [title, setTitle] = useState('');
   const [complainDesc, setComplainDesc] = useState('');
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -81,44 +81,80 @@ const AddNewComplain = () => {
   const addComplaint = () => {
     setLoading(true);
 
-    let formData = new FormData();
-    formData.append('complainerId', complainerDetails.id);
+    let isValidated = validateData();
 
-    formData.append('instituteId', selectedInstitute.value);
-    formData.append('complainTitle', title);
-    formData.append('complainDescription', complainDesc);
-    formData.append('location', location);
-    formData.append('imageFile', selectedImage);
+    if (isValidated) {
+
+      let formData = new FormData();
+      formData.append('complainerId', complainerDetails.id);
+
+      formData.append('instituteId', selectedInstitute.value);
+      formData.append('complainTitle', title);
+      formData.append('complainDescription', complainDesc);
+      formData.append('location', location);
+
+      if (selectedImage !== null)
+        formData.append('imageFile', selectedImage);
 
 
-    axios({
-      method: 'POST',
-      url: `http://localhost:8080/complaint/add-complaint`,
-      data: formData
-    }).then((res) => {
+      axios({
+        method: 'POST',
+        url: `http://localhost:8080/complaint/add-complaint`,
+        data: formData
+      }).then((res) => {
 
-      let data = res.data;
-      console.log(data);
+        let data = res.data;
+        console.log(data);
+        setLoading(false);
+
+        clearForm();
+
+        Toast('close');
+        Toast('success', 'Successfully saved');
+
+      }).catch((error) => {
+        console.log(error);
+        setLoading(false);
+
+        if (error.response !== undefined) {
+          Toast('close');
+          Toast('error', error.response.data);
+        } else {
+          Toast('close');
+          Toast('error', 'Something went wrong');
+        }
+
+      })
+
+    }
+
+  }
+
+  // validate input data - function
+  const validateData = () => {
+    if (Object.keys(selectedInstitute).length === 0) {
       setLoading(false);
-
-      clearForm();
-
       Toast('close');
-      Toast('success', 'Successfully saved');
-
-    }).catch((error) => {
-      console.log(error);
+      Toast('error', 'Please select a institute');
+      return false;
+    } else if (location.length === 0) {
       setLoading(false);
-
-      if (error.response !== undefined) {
-        Toast('close');
-        Toast('error', error.response.data);
-      } else {
-        Toast('close');
-        Toast('error', 'Something went wrong');
-      }
-
-    })
+      Toast('close');
+      Toast('error', 'Location can not be empty');
+      return false;
+    } else if (title.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Title can not be empty');
+      return false;
+    } else if (complainDesc.length === 0) {
+      setLoading(false);
+      Toast('close');
+      Toast('error', 'Description can not be empty');
+      return false;
+    } else {
+      return true;
+    }
   }
 
   const clearForm = () => {
@@ -126,7 +162,7 @@ const AddNewComplain = () => {
     setLocation('');
     setTitle('');
     setComplainDesc('');
-    setSelectedImage('');
+    setSelectedImage({});
   }
 
   return (

@@ -43,17 +43,7 @@ const ComplainerProfile = () => {
   });
   const [modal, setModal] = useState(false);
 
-  const onInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  const submitForm = () => {
-    let submitData = {
-      ...formData,
-    };
-    setUserInfo(submitData);
-    setModal(false);
-  };
 
   // function to change the design view under 990 px
   const viewChange = () => {
@@ -91,9 +81,25 @@ const ComplainerProfile = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
 
+
   useEffect(() => {
     getComplainerDetailsById();
   }, [ComplainerProfile])
+
+
+  useEffect(() => {
+    if (modal) {
+      setName(profileInfo.name);
+      setEmail(profileInfo.email);
+      if (profileInfo.phoneNumber !== undefined) {
+        setPhoneNumber(profileInfo.phoneNumber);
+      }
+      if (profileInfo.address !== undefined) {
+        setAddress(profileInfo.address);
+      }
+      setPassword(profileInfo.password);
+    }
+  }, [modal])
 
 
   // get complainer details by complainer id
@@ -148,6 +154,7 @@ const ComplainerProfile = () => {
 
         let data = res.data;
         setLoading(false);
+        setModal(false);
 
         Toast('close');
         Toast('success', 'Succussfully updated');
@@ -309,7 +316,7 @@ const ComplainerProfile = () => {
                             onChange={(e) => {
                               setName(e.target.value);
                             }}
-                            defaultValue={profileInfo.name}
+                            value={name}
                             placeholder="Enter name"
                           />
                         </div>
@@ -327,7 +334,7 @@ const ComplainerProfile = () => {
                             onChange={(e) => {
                               setEmail(e.target.value);
                             }}
-                            defaultValue={profileInfo.email}
+                            value={email}
                             placeholder="Enter email"
                           />
                         </div>
@@ -345,7 +352,7 @@ const ComplainerProfile = () => {
                             onChange={(e) => {
                               setPhoneNumber(e.target.value);
                             }}
-                            defaultValue={profileInfo.phoneNumber}
+                            value={phoneNumber}
                             placeholder="Phone Number"
                           />
                         </div>
@@ -363,7 +370,7 @@ const ComplainerProfile = () => {
                             onChange={(e) => {
                               setAddress(e.target.value);
                             }}
-                            defaultValue={profileInfo.address}
+                            value={address}
                             placeholder="Enter address"
                           />
                         </div>
@@ -382,7 +389,7 @@ const ComplainerProfile = () => {
                             onChange={(e) => {
                               setPassword(e.target.value);
                             }}
-                            defaultValue={profileInfo.password}
+                            value={password}
                             placeholder="Enter password"
                           />
                         </div>
